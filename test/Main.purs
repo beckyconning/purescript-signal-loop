@@ -16,12 +16,15 @@ main = do
   interface <- createInterface noCompletion
 
   let makePrompt :: String -> Emitter _ String
-      makePrompt s c = void do
-        log $ "You typed: " ++ s
-        setPrompt "> " 2 interface
+      makePrompt s c = do
+        setPrompt ">" 2 interface
         setLineHandler (send c) interface
+        case s of
+          "" -> return unit
+          s  -> log $ "You typed: " ++ s
         prompt interface
- 
+        return s
+
   -- The loop reads the most recently entered string from the "future" signal
   -- and uses the makePrompt function to display it.
   runLoop "" \future -> makePrompt <$> future
